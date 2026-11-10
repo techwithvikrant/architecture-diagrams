@@ -6,9 +6,8 @@
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue">
 </p>
 
-**Created by Vikrant Nalawade**, Senior DevOps Engineer specialising in Kubernetes/OpenShift,
-NGINX and observability · [LinkedIn](https://www.linkedin.com/in/YOUR-LINKEDIN-ID) ·
-[GitHub](https://github.com/YOUR-GITHUB-USERNAME)
+**Created by Vikrant Nalawade** · [LinkedIn](https://www.linkedin.com/in/vikrantnalawade) ·
+[GitHub](https://github.com/techwithvikrant)
 
 Turn a screenshot, a whiteboard photo or a plain description into **customer-ready architecture
 diagrams**, from current state through migration phases to target state. Every run delivers:
@@ -121,9 +120,8 @@ Linux with `xvfb-run`, Python 3 with Pillow and pypdf, and network access to git
 
 ## Author
 
-**Vikrant Nalawade**: Senior DevOps Engineer · Kubernetes / OpenShift · NGINX · Observability · AI infrastructure
-
-- LinkedIn: https://www.linkedin.com/in/YOUR-LINKEDIN-ID
-- GitHub: https://github.com/YOUR-GITHUB-USERNAME
+**Vikrant Nalawade**
+- LinkedIn: https://www.linkedin.com/in/vikrantnalawade
+- GitHub: https://github.com/techwithvikrant
 
 If this skill saves you time, please star the repo and share your diagrams. Issues and pull requests are welcome.
