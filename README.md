@@ -40,7 +40,7 @@ that account with code execution turned on.
 first enable Skills in **Organization settings**.
 
 ### Claude.ai in any browser (Chrome, Edge, Safari, Firefox)
-1. Download `architecture-diagrams.zip` from the Releases page. Or zip this folder yourself; the
+1. Download `architecture-diagrams.zip` from the [Releases page](https://github.com/techwithvikrant/architecture-diagrams/releases/latest). Or zip this folder yourself; the
    folder must stay named `architecture-diagrams`.
 2. Open claude.ai, then go to **Customize > Skills > + > Create skill > Upload a skill**.
 3. Select the zip. Check that the skill appears in the list with its toggle **on**.
@@ -67,7 +67,7 @@ Check Anthropic's help centre for the latest.
 
 ### Claude Code (terminal / IDE)
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/architecture-diagrams ~/.claude/skills/architecture-diagrams
+git clone https://github.com/techwithvikrant/architecture-diagrams ~/.claude/skills/architecture-diagrams
 ```
 On Windows, the path is `%USERPROFILE%\.claude\skills\architecture-diagrams`. Skills turned on in your
 Claude account settings also sync to Claude Code when you're signed in with the same account; run
