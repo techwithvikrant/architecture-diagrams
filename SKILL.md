@@ -147,4 +147,4 @@ grow in the same positions. Add a roadmap overview page and an optional cover pa
   output and PDF export. Offer the `.drawio` file, which Excalidraw users can still view as PNG/PDF.
 
 ---
-Skill author: Vikrant Nalawade (MIT licence).
+Skill author: Vikrant Nalawade · https://github.com/techwithvikrant/architecture-diagrams (MIT licence).
