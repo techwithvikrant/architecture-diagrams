@@ -377,14 +377,31 @@ def _seg_relation(a, b):
     return None
 
 # ----------------------------------------------------------------------------- build
+def drawio_available():
+    """True when the draw.io CLI and xvfb-run are usable (tries the setup script once)."""
+    import shutil
+    if os.path.exists(DRAWIO_BIN) and shutil.which('xvfb-run'):
+        return True
+    setup = os.path.join(SKILL_DIR, 'scripts', 'setup_drawio.sh')
+    try:
+        subprocess.run(['bash', setup], capture_output=True, text=True, timeout=240)
+    except Exception:
+        pass
+    return os.path.exists(DRAWIO_BIN) and bool(shutil.which('xvfb-run'))
+
 def _run_drawio(args):
-    if not os.path.exists(DRAWIO_BIN):
-        raise SystemExit(f'draw.io CLI not found at {DRAWIO_BIN}. Run scripts/setup_drawio.sh first.')
     cmd = ['xvfb-run', '-a', DRAWIO_BIN, '-x'] + args + ['--no-sandbox', '--disable-gpu']
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     out = r.stdout + r.stderr
     if 'Export failed' in out or 'Error:' in out.replace('ERROR:bus', ''):
         raise SystemExit('draw.io export failed:\n' + '\n'.join(l for l in out.splitlines() if 'bus.cc' not in l))
+
+def default_out_dir(project):
+    """Claude: /mnt/user-data/outputs, ChatGPT: /mnt/data, otherwise ./outputs."""
+    for base in ('/mnt/user-data/outputs', '/mnt/data'):
+        if os.path.isdir(base) and os.access(base, os.W_OK):
+            return os.path.join(base, project)
+    return os.path.join(os.getcwd(), 'outputs', project)
 
 def build(pages, out_dir, basename, png_names=None, allow_crossings=0, strict=True, scale=2, review_dir='/tmp/diagram-review'):
     """Validate every page, write <basename>.drawio, PNG per page (PNG/), combined PDF, and a review contact sheet."""
@@ -403,9 +420,17 @@ def build(pages, out_dir, basename, png_names=None, allow_crossings=0, strict=Tr
         raise SystemExit('\nGeometry check failed. Fix the errors above, then build again.')
     ids = [p.pid for p in pages]
     assert len(ids) == len(set(ids)), 'page ids must be unique'
-    os.makedirs(os.path.join(out_dir, 'PNG'), exist_ok=True)
+    os.makedirs(out_dir, exist_ok=True)
     drawio = os.path.join(out_dir, basename + '.drawio')
     open(drawio, 'w').write('<mxfile host="drawio" agent="architecture-diagrams-skill">' + ''.join(p.xml() for p in pages) + '</mxfile>')
+    if not drawio_available():
+        print(f'\nOK  {drawio}\n'
+              'NOTE  The draw.io renderer could not be installed here (no internet access in this sandbox), '
+              'so PNG and PDF were not produced.\n'
+              '      Tell the user: open the .drawio file at https://app.diagrams.net, then\n'
+              '      File > Export as > PDF (tick "All pages") and File > Export as > PNG (zoom 200%).')
+        return dict(drawio=drawio, pdf=None, pngs=[], sheet=None)
+    os.makedirs(os.path.join(out_dir, 'PNG'), exist_ok=True)
     pngs = []
     for i, p in enumerate(pages):
         name = (png_names[i] if png_names else f'{i:02d}_' + re.sub(r'[^A-Za-z0-9]+', '_', p.name).strip('_')) + '.png'
