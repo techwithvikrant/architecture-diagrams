@@ -1,6 +1,6 @@
 ---
 name: architecture-diagrams
-description: Create precise, customer-ready architecture diagrams as editable draw.io files plus PNG images and one combined PDF. Use this skill whenever the user wants to draw, recreate, clean up or redesign an architecture, data-flow, infrastructure, observability, network or deployment diagram; turn a screenshot or whiteboard photo of a diagram into a clean one; show current state vs target state; show a migration or modernization in phases (phase 1, phase 2 ... final); or build a roadmap or "as-is / to-be" deck for a customer, even if they only say "diagram", "draw this", "flow", "draw.io", "excalidraw" or "make it presentable".
+description: Create precise, customer-ready architecture diagrams as an editable draw.io file plus PNG per page and one combined PDF. Use whenever the user wants to draw, recreate or clean up an architecture, data-flow, infrastructure, network or deployment diagram (including from a screenshot), show current vs target state, or show a migration in phases for a customer deck.
 ---
 
 # Architecture Diagrams (draw.io, presentation-grade)
@@ -28,14 +28,19 @@ what opens in their editor.
 bash <skill>/scripts/setup_drawio.sh
 ```
 
-This puts the draw.io CLI at `/tmp/drawio-cli`. If the download is blocked, tell the user that the
-container needs network access to github.com and cdn.jsdelivr.net.
+This puts the draw.io CLI at `/tmp/drawio-cli`. It needs network access to github.com and
+cdn.jsdelivr.net. If the sandbox has no internet, `build()` still writes the `.drawio` file (all
+validation still runs) and prints the 30-second manual export steps for PNG and PDF. Pass these steps
+on to the user.
+
+Works in any app that supports Agent Skills and can run Python and bash, including Claude,
+ChatGPT and Codex.
 
 ### 2. Clarify before drawing
 
 Read `references/clarifying-questions.md`. Ask **only** what you cannot infer from the request, the
-screenshot or the conversation. Use `ask_user_input_v0` with at most 3 questions in one round, and skip
-it entirely if everything is clear. Never ask about things that have a sensible default; state those
+screenshot or the conversation. Ask at most 3 questions in one round (use the app's multiple-choice
+question tool if it has one), and skip this step entirely if everything is clear. Never ask about things that have a sensible default; state those
 defaults in one line instead. The questions that most often matter:
 
 - Which pages: current state only, target only, or the full story (current, roadmap, phases, target)?
@@ -65,13 +70,13 @@ Read `references/layout-playbook.md` before placing anything. In short:
 
 ### 5. Write the build script
 
-Create `/home/claude/<project>/build.py`. Start from `examples/monolith-to-microservices/build.py`,
+Create `<work-dir>/<project>/build.py`, in any writable working folder. Start from `examples/monolith-to-microservices/build.py`,
 a complete 5-page deck (cover, current, phase 1, phase 2, target) that works for any technology:
 swap the boxes, icons and flows. The API is in `references/api.md`. Minimal shape:
 
 ```python
 import sys; sys.path.insert(0, '<skill>/scripts')
-from drawio_lib import Page, build
+from drawio_lib import Page, build, default_out_dir
 
 p = Page('cur', '1. Current State')                 # unique short id, tab name
 p.header('Current State: Web Platform', 'As-is flow: ...')
@@ -84,7 +89,7 @@ p.edge('e1', 'app', 'db', [(315, 500), (385, 500)])
 p.label(350, 482, 'SQL')
 p.why('Why change', ['<b>Point:</b> one-line reason', '...'])
 
-build([p], out_dir='/mnt/user-data/outputs/<Project>', basename='<Project>_Architecture')
+build([p], out_dir=default_out_dir('<Project>'), basename='<Project>_Architecture')
 ```
 
 ### 6. Build and fix until clean
@@ -96,7 +101,7 @@ fine if the render looks good, but fix any that show clipped or crowded text.
 ### 7. Look at every page (mandatory)
 
 Open `/tmp/diagram-review/contact_sheet.png`, then each `/tmp/diagram-review/page_NN.png`, with the
-`view` tool. Check it against the list below. Fix, rebuild and look again. Two passes are normal.
+image-viewing tool. If PNGs couldn't be rendered offline, review the geometry report instead and say so. Check it against the list below. Fix, rebuild and look again. Two passes are normal.
 
 - [ ] Every component and flow from the inventory is present, with the correct arrow direction.
 - [ ] No text overflows a box or touches a border; no label sits on a line or box.
@@ -108,8 +113,9 @@ Open `/tmp/diagram-review/contact_sheet.png`, then each `/tmp/diagram-review/pag
 
 ### 8. Deliver
 
-Files are already in `/mnt/user-data/outputs/<Project>/`. Call `present_files` with the PDF first, then
-the `.drawio`, then the PNGs. Reply in 3 to 6 lines covering what's in the deck (page list), how to edit
+Files are already in the output folder: `/mnt/user-data/outputs` in Claude, `/mnt/data` in ChatGPT,
+otherwise `./outputs`. Share or attach them with the PDF first, then the `.drawio`, then the PNGs, using
+the app's file-sharing tool if it has one, or download links. Reply in 3 to 6 lines covering what's in the deck (page list), how to edit
 it (open the `.drawio` at app.diagrams.net or in draw.io Desktop; shapes stay connected), and any
 assumption the user should verify.
 
