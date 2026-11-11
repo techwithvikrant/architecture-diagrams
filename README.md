@@ -1,7 +1,9 @@
-# architecture-diagrams: a Claude skill for presentation-grade architecture diagrams
+# architecture-diagrams: an AI skill for presentation-grade architecture diagrams
 
 <p>
-  <img alt="Claude Skill" src="https://img.shields.io/badge/Claude-Skill-D97757">
+  <img alt="Claude" src="https://img.shields.io/badge/Claude-Skill-D97757">
+  <img alt="ChatGPT" src="https://img.shields.io/badge/ChatGPT-Skill-10A37F">
+  <img alt="Codex" src="https://img.shields.io/badge/Codex-Skill-000000">
   <img alt="draw.io" src="https://img.shields.io/badge/output-draw.io%20%7C%20PNG%20%7C%20PDF-0F766E">
   <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue">
 </p>
@@ -20,6 +22,22 @@ Diagrams have no crossing arrows, no text on lines, consistent status colours (e
 changed, retiring), brand icons, and a short "why" panel on every slide.
 
 ![example](examples/monolith-to-microservices/preview.png)
+
+Built on the open **Agent Skills** standard (`SKILL.md`), so the same folder works in **Claude**,
+**ChatGPT** and **Codex**.
+
+## Where it works
+
+| App | Works? | Output |
+| --- | --- | --- |
+| Claude (web, Desktop, Claude Code) | Yes | `.drawio` + PNG + PDF |
+| ChatGPT (Skills) | Yes | `.drawio` always. PNG + PDF only if the sandbox has internet; otherwise a 30-second export (below) |
+| OpenAI Codex | Yes | `.drawio` + PNG + PDF (Linux, with internet) |
+
+**Why ChatGPT may give only the `.drawio`:** PNG and PDF are rendered by the draw.io app, which the
+skill downloads at run time. ChatGPT's sandbox usually has no internet, so it can't download it. The
+diagram itself is identical: open the `.drawio` at [app.diagrams.net](https://app.diagrams.net), then
+**File > Export as > PDF** (tick *All pages*) and **File > Export as > PNG** (zoom 200%).
 
 ## How it works
 - `scripts/drawio_lib.py`: place boxes on a 1920x1080 grid and give every edge explicit, axis-aligned
@@ -73,6 +91,20 @@ On Windows, the path is `%USERPROFILE%\.claude\skills\architecture-diagrams`. Sk
 Claude account settings also sync to Claude Code when you're signed in with the same account; run
 `/skills` to check.
 
+### ChatGPT
+1. Download `architecture-diagrams.zip` from the [Releases page](https://github.com/techwithvikrant/architecture-diagrams/releases/latest).
+2. In ChatGPT, open **Skills > Create > Upload from your computer** and upload the zip.
+3. Check that the skill shows as installed, then use it from a new chat. You can type
+   **@architecture-diagrams** to call it directly.
+
+Skills must be enabled for your plan or workspace (a workspace owner controls this on Business and Enterprise).
+
+### OpenAI Codex
+```bash
+git clone https://github.com/techwithvikrant/architecture-diagrams ~/.agents/skills/architecture-diagrams
+```
+Restart Codex afterwards. For a single repo, put it in `.agents/skills/architecture-diagrams` instead.
+
 ### Sharing inside your organization (Team / Enterprise)
 Go to **Customize > Skills**, open the skill, click **Share**, and choose specific people or the
 entire organization. An org owner must first enable skill sharing in Organization settings.
@@ -84,14 +116,14 @@ entire organization. An org owner must first enable skill sharing in Organizatio
 - **Build says the draw.io CLI is missing or the download failed:** the sandbox needs network access
   to github.com and cdn.jsdelivr.net. On Team or Enterprise plans, ask an org owner to allow these domains.
 
-## Which Claude model to use
+## Which model to use
 
-| Use | Model |
+| App | Recommended model |
 | --- | --- |
-| **Recommended for most work** (multi-page decks, phased migrations, recreating complex screenshots) | **Claude Opus 5.5** |
-| Quick, single, simple diagrams | Claude Sonnet 5.5 |
+| Claude | **Claude Opus 5.5** for decks, phases and screenshots; Claude Sonnet 5.5 for quick single diagrams |
+| ChatGPT / Codex | Your most capable reasoning model |
 
-Turn on extended thinking if your app offers it. Layout planning benefits from it.
+Turn on extended thinking or reasoning if your app offers it. Layout planning benefits from it.
 
 ## Use
 It works for any architecture (cloud, data, network, security, application, observability). Just ask, for example:
@@ -99,7 +131,7 @@ It works for any architecture (cloud, data, network, security, application, obse
 - "Use the architecture-diagrams skill: current vs target state for our web platform moving to Kubernetes."
 - "Draw a data-flow diagram of this pipeline and give me draw.io, PNG and PDF."
 
-Claude asks up to 3 clarifying questions only if something is ambiguous, then builds, validates,
+The AI asks up to 3 clarifying questions only if something is ambiguous, then builds, validates,
 visually reviews and delivers the files.
 
 ## Run the example locally
